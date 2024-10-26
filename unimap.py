@@ -22,13 +22,13 @@ def import_file(path):
     return df
 
 def angel_map():
-    # download_master('Angel')
+    download_master('Angel')
     raw_df = import_file('datasets/angel_one.csv')
     df = raw_df[['token', 'symbol', 'exch_seg', 'instrumenttype', 'name']]
     return df
 
 def zerodha_map():
-    # download_master('Zerodha')
+    download_master('Zerodha')
     raw_df = import_file('datasets/zerodha_master_scrip.csv')
     df = raw_df[['instrument_token', 'exchange_token', 'exchange', 'instrument_type', 'name']]
     return df
@@ -58,7 +58,7 @@ def kotak_map():
     return selected_df
 
 def fyer_map():
-    # download_master('Fyers')
+    download_master('Fyers')
     path = 'datasets/Fyers'
     raw_dfs = load_dirs(path, ['NSE_CD', 'NSE_FO', 'NSE_CM', 'BSE_CM', 'BSE_FO', 'MCX_COM'])
     merged_df = pd.concat(raw_dfs, axis=0, ignore_index=True)
@@ -76,7 +76,7 @@ def get_instrumenttype(symbol_ticker):
     return match.group(1) if match else None
 
 def icici_map():
-    # download_master('ICICI')
+    download_master('ICICI')
     path = 'datasets/icici'
     raw_dfs = load_dirs(path, ['BSEScripMaster', 'CDNSEScripMaster', 'FOBSEScripMaster', 'FONSEScripMaster', 'NSEScripMaster'])
     # raw_dfs[0][['exchange']] = raw_dfs[2][['exchange']] = 'BSE'
@@ -122,3 +122,47 @@ def icici_map():
     merge_df = pd.concat(selected_dfs, axis=0, ignore_index=True)
     return merge_df
 
+def merger(brokers):
+    options = {
+        '1': fyer_map,
+        '2': angel_map,
+        '3': icici_map,
+        '4': kotak_map,
+        '5': zerodha_map
+    }
+
+    headers = ['Token', 'ExchangeCode', 'exchange', 'Series', 'CompanyName', 'ISINCode']
+
+    dfs = []
+    for broker in brokers:
+        df = options[broker]
+        df.columns = headers
+        dfs.append(df)
+    
+    # Merge
+
+    merged_df = pd.concat(dfs, axis=0, ignore_index=True)
+    return merged_df
+
+def menu():
+    print('''
+          Welcome to UniBroker Tool
+            '1'. Fyers
+            '2'. Angel One
+            '3'. ICICI Direct
+            '4'. Kotak
+            '5'. Zerodha Kite 
+            '9'. All
+          
+          please enter choices separated by a ','
+          ''')
+    choice = input()
+    brokers = []
+    if '9' in choice:
+        for i in range(1, 6):
+            brokers.append(f'{i}')
+    else:
+        for i in choice.split(','):
+            brokers.append(f'{i}')
+    
+    print(merger(brokers=brokers))
