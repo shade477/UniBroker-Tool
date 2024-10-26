@@ -25,7 +25,11 @@ def angel_map():
     df = raw_df[['token', 'symbol', 'exch_seg', 'instrumenttype', 'name']]
     return df
 
-
+def zerodha_map():
+    # download_master('Zerodha')
+    raw_df = import_file('datasets/zerodha_master_scrip.csv')
+    df = raw_df[['instrument_token', 'exchange_token', 'exchange', 'instrument_type', 'name']]
+    return df
 
 
 
