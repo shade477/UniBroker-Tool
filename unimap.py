@@ -7,8 +7,9 @@
 import fetch
 import pandas as pd
 import re
-## Fetch the data
 
+
+## Fetch the data
 def download_datasets():
     fetch.fetch_all()
 
@@ -74,9 +75,50 @@ def get_instrumenttype(symbol_ticker):
     match = re.search(r'([A-Z]+)$', symbol_ticker)
     return match.group(1) if match else None
 
-def main():
-    print(fyer_map())
-    # kotak_map()
+def icici_map():
+    # download_master('ICICI')
+    path = 'datasets/icici'
+    raw_dfs = load_dirs(path, ['BSEScripMaster', 'CDNSEScripMaster', 'FOBSEScripMaster', 'FONSEScripMaster', 'NSEScripMaster'])
+    # raw_dfs[0][['exchange']] = raw_dfs[2][['exchange']] = 'BSE'
+    
+    raw_dfs[0] = raw_dfs[0].assign(exchange='BSE')
+    raw_dfs[2] = raw_dfs[2].assign(exchange='BSE')
+    
+    # raw_dfs[1][['ISINCode']] = raw_dfs[2][['ISINCode']] = raw_dfs[3][['ISINCode']] = ''
+    # raw_dfs[1][['exchange']] = raw_dfs[3][['exchange']] = raw_dfs[4][['exchange']] = 'NSE'
 
-if __name__ == '__main__':
-    main()
+    # Set ISINCode to an empty string where needed
+    for i in [1, 2, 3]:
+        raw_dfs[i] = raw_dfs[i].assign(ISINCode='')
+
+    # Assign NSE exchange values
+    for i in [1, 3, 4]:
+        raw_dfs[i] = raw_dfs[i].assign(exchange='NSE')
+
+    
+    # selected_dfs = []
+    # selected_dfs.append(raw_dfs[0][['Token', 'ExchangeCode', 'exchange', 'Series', 'CompanyName', 'ISINCode']])
+    # selected_dfs.append(raw_dfs[1][['Token', 'ExchangeCode', 'exchange', 'OptionType', 'InstrumentName', 'ISINCode']])
+    # selected_dfs.append(raw_dfs[2][['Token', 'ExchangeCode', 'exchange', 'OptionType', 'CompanyName', 'ISINCode']])
+    # selected_dfs.append(raw_dfs[3][['Token', 'ExchangeCode', 'exchange', 'OptionType', 'CompanyName', 'ISINCode']])
+    # selected_dfs.append(raw_dfs[4][['Token', 'ExchangeCode', 'exchange', 'Series', 'CompanyName', 'ISINCode']])
+
+    raw_dfs[4].columns = raw_dfs[4].columns.str.lstrip().str.strip('"')
+
+    selected_dfs = [
+        raw_dfs[0][['Token', 'ExchangeCode', 'exchange', 'Series', 'CompanyName', 'ISINCode']],
+        raw_dfs[1][['Token', 'ExchangeCode', 'exchange', 'OptionType', 'InstrumentName', 'ISINCode']],
+        raw_dfs[2][['Token', 'ExchangeCode', 'exchange', 'OptionType', 'CompanyName', 'ISINCode']],
+        raw_dfs[3][['Token', 'ExchangeCode', 'exchange', 'OptionType', 'CompanyName', 'ISINCode']],
+        raw_dfs[4][['Token', 'ShortName', 'exchange', 'Series', 'CompanyName', 'ISINCode']]
+    ]
+    
+    # To diagnose not matching headers
+    # columns = ['Token', 'ShortName', 'exchange', 'Series', 'CompanyName', 'ISINCode']
+    # for name in raw_dfs[3].columns:
+    #     if name not in columns:
+    #         print(name)
+
+    merge_df = pd.concat(selected_dfs, axis=0, ignore_index=True)
+    return merge_df
+

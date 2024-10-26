@@ -135,12 +135,12 @@ def angelOne():
                     
 def icici_smart():
     url = datasets['icici']
-    filename = 'icici_master_scrip'
+    # filename = 'icici_master_scrip'
     print('Fetching data from ICICI Direct Breeze')
     try:
         response = requests.get(url)
         response.raise_for_status()
-        extract_zip(response.content)
+        extract_zip(response.content, extract_to='datasets/icici')
     except requests.RequestException as e:
         print(f'Error fetching data from {url}: {e}')
 
