@@ -146,7 +146,7 @@ def merger(brokers):
     for broker in brokers:
         # print(broker)
         df = options[broker]()
-        print(df.columns)
+        # print(df.columns)
         df.columns = headers
         dfs.append(df)
     
@@ -176,5 +176,5 @@ def menu():
         for i in choice.split(','):
             brokers.append(f'{i}')
     
-    # print(merger(brokers=brokers))
-    merger(brokers=brokers)
+    print(merger(brokers=brokers))
+    # merger(brokers=brokers)
