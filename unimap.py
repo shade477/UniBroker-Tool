@@ -68,6 +68,7 @@ def fyer_map():
     selected_df['exchange'] = selected_df['symbol_ticker'].apply(get_exchange)
     selected_df['instrumenttype'] = selected_df['symbol_ticker'].apply(get_instrumenttype)
     selected_df.drop(columns=['symbol_ticker'], inplace=True)
+    selected_df = selected_df.reindex(columns=['fytoken', 'underlying_symbol', 'exchange', 'instrumenttype', 'symbol_details', 'ISINCode'])
     return selected_df
 
 def get_exchange(symbol_ticker):
@@ -145,7 +146,7 @@ def merger(brokers):
     for broker in brokers:
         # print(broker)
         df = options[broker]()
-        # print(df.columns)
+        print(df.columns)
         df.columns = headers
         dfs.append(df)
     
@@ -175,4 +176,5 @@ def menu():
         for i in choice.split(','):
             brokers.append(f'{i}')
     
-    print(merger(brokers=brokers))
+    # print(merger(brokers=brokers))
+    merger(brokers=brokers)
