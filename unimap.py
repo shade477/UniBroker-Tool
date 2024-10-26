@@ -53,11 +53,19 @@ def kotak_map():
         raw_df.columns = headers
     
     merged_df = pd.concat(raw_dfs, axis=0, ignore_index=True)
+    selected_df = merged_df[['instrumentToken', 'instrumentName', 'exchange', 'instrumentType', 'name', 'isin']]
+    return selected_df
+
+def fyer_map():
+    download_master('Fyers')
+    path = 'datasets/Fyers'
+    raw_dfs = load_dirs(path, ['NSE_CD', 'NSE_FO', 'NSE_CM', 'BSE_CM', 'BSE_FO', 'MCX_COM'])
+    merged_df = pd.concat(raw_dfs, axis=0, ignore_index=True)
     return merged_df
 
 
 def main():
-    print(kotak_map())
+    print(fyer_map())
     # kotak_map()
 
 if __name__ == '__main__':

@@ -95,6 +95,7 @@ def fyers():
     filenames = ['NSE_CD', 'NSE_FO', 'NSE_CM', 'BSE_CM', 'BSE_FO', 'MCX_COM']
     
     print("Fetching master scrip from Fyers Trading...")
+
     for filename, url in zip(filenames, datasets["fyers"].values()):
         print(f"Fetching data from {url}...")
         try:
@@ -105,7 +106,9 @@ def fyers():
                 print("Success")
                 # Combine headers with CSV data
                 csv_data = ','.join(headers) + '\n' + response.text
-                export_data(filename, csv_data)
+                path = f'fyers/{filename}'
+                
+                export_data(path, csv_data)
                 
         except requests.RequestException as e:
             print(f"Error fetching data from {url}: {e}")
