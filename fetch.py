@@ -54,13 +54,17 @@ def extract_zip(response, extract_to='datasets'):
 
 
 
-def export_data(filename, data='', headers=None, is_json=False):
+def export_data(path, data='', headers=None, is_json=False):
+    dir_path = path.split('/')[:-1]
+    dir_path = '/'.join(dir_path)
+    filename = path.split('/')[-1]
     if not data:
         print(f'{filename} is empty')
         return
     
-    os.makedirs('datasets', exist_ok=True)
-    path = f'datasets/{filename}.csv'
+    
+    os.makedirs(f'datasets/{dir_path}', exist_ok=True)
+    path = f'datasets/{path}.csv'
 
     print(f'Writing to file {filename}...')
     
@@ -153,11 +157,12 @@ def kotak():
     request = datasets['kotak']
     print('Fetching from Kotak')
     for filename, url in request.items():
+        path = 'Kotak/'+filename
         print(f"Starting {filename}")
         try:
             response = requests.get(url)
             response.raise_for_status()
-            export_data(filename, response.text.replace('|', ','))
+            export_data(path, response.text.replace('|', ','))
         except requests.RequestException as e:
             print(f"Error fetching data from {url}: {e}")
 
