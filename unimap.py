@@ -25,12 +25,14 @@ def angel_map():
     download_master('Angel')
     raw_df = import_file('datasets/angel_one.csv')
     df = raw_df[['token', 'symbol', 'exch_seg', 'instrumenttype', 'name']]
+    df = df.assign(ISINCode=None)
     return df
 
 def zerodha_map():
     download_master('Zerodha')
     raw_df = import_file('datasets/zerodha_master_scrip.csv')
     df = raw_df[['instrument_token', 'exchange_token', 'exchange', 'instrument_type', 'name']]
+    df = df.assign(ISINCode=None)
     return df
 
 def load_dirs(path, files):
@@ -89,7 +91,7 @@ def icici_map():
 
     # Set ISINCode to an empty string where needed
     for i in [1, 2, 3]:
-        raw_dfs[i] = raw_dfs[i].assign(ISINCode='')
+        raw_dfs[i] = raw_dfs[i].assign(ISINCode=None)
 
     # Assign NSE exchange values
     for i in [1, 3, 4]:
@@ -112,6 +114,11 @@ def icici_map():
         raw_dfs[3][['Token', 'ExchangeCode', 'exchange', 'OptionType', 'CompanyName', 'ISINCode']],
         raw_dfs[4][['Token', 'ShortName', 'exchange', 'Series', 'CompanyName', 'ISINCode']]
     ]
+
+    headers = ['Token', 'ExchangeCode', 'exchange', 'Series', 'CompanyName', 'ISINCode']
+
+    for df in selected_dfs:
+        df.columns = headers
     
     # To diagnose not matching headers
     # columns = ['Token', 'ShortName', 'exchange', 'Series', 'CompanyName', 'ISINCode']
@@ -120,6 +127,7 @@ def icici_map():
     #         print(name)
 
     merge_df = pd.concat(selected_dfs, axis=0, ignore_index=True)
+
     return merge_df
 
 def merger(brokers):
@@ -135,7 +143,9 @@ def merger(brokers):
 
     dfs = []
     for broker in brokers:
-        df = options[broker]
+        # print(broker)
+        df = options[broker]()
+        # print(df.columns)
         df.columns = headers
         dfs.append(df)
     

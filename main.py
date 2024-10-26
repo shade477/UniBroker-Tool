@@ -1,10 +1,7 @@
-import fetch
+import unimap
 
 def main():
-    # print("Enter Choice: ")
-    # key = input()
-    fetch.fetch('Angel')
-    # fetch.fetch_all()
+    unimap.menu()
 
 if __name__ == '__main__':
     main()
