@@ -6,7 +6,7 @@
 
 import fetch
 import pandas as pd
-
+import re
 ## Fetch the data
 
 def download_datasets():
@@ -40,7 +40,7 @@ def load_dirs(path, files):
     return dfs
 
 def kotak_map():
-    # download_master('Kotak')
+    download_master('Kotak')
     path = 'datasets/Kotak'
     raw_dfs = load_dirs(path, ['cash', 'futures'])
     headers = ['instrumentToken','instrumentName','name',
@@ -57,12 +57,22 @@ def kotak_map():
     return selected_df
 
 def fyer_map():
-    download_master('Fyers')
+    # download_master('Fyers')
     path = 'datasets/Fyers'
     raw_dfs = load_dirs(path, ['NSE_CD', 'NSE_FO', 'NSE_CM', 'BSE_CM', 'BSE_FO', 'MCX_COM'])
     merged_df = pd.concat(raw_dfs, axis=0, ignore_index=True)
-    return merged_df
+    selected_df = merged_df[['fytoken', 'underlying_symbol', 'symbol_ticker', 'isin', 'symbol_details']]
+    selected_df['exchange'] = selected_df['symbol_ticker'].apply(get_exchange)
+    selected_df['instrumenttype'] = selected_df['symbol_ticker'].apply(get_instrumenttype)
+    selected_df.drop(columns=['symbol_ticker'], inplace=True)
+    return selected_df
 
+def get_exchange(symbol_ticker):
+    return symbol_ticker.split(':')[0]
+
+def get_instrumenttype(symbol_ticker):
+    match = re.search(r'([A-Z]+)$', symbol_ticker)
+    return match.group(1) if match else None
 
 def main():
     print(fyer_map())
